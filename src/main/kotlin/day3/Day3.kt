@@ -8,14 +8,12 @@ class Day3 {
         test2()
     }
 
-
     private fun test1() {
         var count = 0
         var row = 0
         var column = 0
 
         val forestList = forest.split("\n")
-
 
         while (row + 1 < forestList.size) {
             row += 1
@@ -50,7 +48,6 @@ class Day3 {
         var column5 = 0
 
         val forestList = forest.split("\n")
-
 
         while (row1 + 1 < forestList.size) {
             row1 += 1
@@ -93,7 +90,6 @@ class Day3 {
         }
 
         println("wesh mamadou ${count1 * count2 * count3 * count4 * count5}")
-
     }
 
     private val forest = StringBuffer(
