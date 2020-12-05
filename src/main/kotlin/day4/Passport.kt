@@ -1,7 +1,7 @@
 package day4
 
 import day4.Passport.Companion.containsOnlyDigits
-import day4.Passport.Companion.containsOnlyLetters
+import day4.Passport.Companion.containsOnlyDigitsOrLettersToF
 
 class Passport(private val content: String) {
     companion object {
@@ -12,16 +12,16 @@ class Passport(private val content: String) {
         const val HAIR_COLOR = "hcl:"
         const val EYE_COLOR = "ecl:"
         const val PASSWORD_ID = "pid:"
-        const val COUNTRY_ID = "cid:"
+
 
         fun containsOnlyDigits(value: String): Boolean {
             val onlyDigits = Regex("[0-9]+")
             return value.matches(onlyDigits)
         }
 
-        fun containsOnlyLetters(value: String): Boolean {
-            val onlyDigits = Regex("[a-zA-Z]+")
-            return value.matches(onlyDigits)
+        fun containsOnlyDigitsOrLettersToF(value: String): Boolean {
+            val onlyLetters = Regex("[0-9a-f]+")
+            return value.matches(onlyLetters)
         }
     }
 
@@ -68,34 +68,36 @@ class Passport(private val content: String) {
             content.contains(PASSWORD_ID)
 
     fun isComplete2(): Boolean {
-        var success = true
-        conditions.forEach {
-            success = it.isComplete()
-        }
-        return success
-    }
+        var count = 0
 
+        conditions.forEach {
+            if (it.isComplete())
+                count++
+        }
+        return count == 7
+    }
 
 }
 
-abstract class Condition() {
+abstract class Condition {
     abstract fun isComplete(): Boolean
 }
 
 class BirthYearCond(private val value: String) : Condition() {
     override fun isComplete(): Boolean {
         return try {
-            value.toInt() in 2002 downTo 1920
+            value.toInt() in 1920..2002 && value.length == 4
         } catch (e: Exception) {
             false
         }
+
     }
 }
 
 class IssueYearCond(private val value: String) : Condition() {
     override fun isComplete(): Boolean {
         return try {
-            value.toInt() in 2020 downTo 2010
+            value.toInt() in 2010..2020 && value.length == 4
         } catch (e: Exception) {
             false
         }
@@ -105,7 +107,7 @@ class IssueYearCond(private val value: String) : Condition() {
 class ExpirationYearCond(private val value: String) : Condition() {
     override fun isComplete(): Boolean {
         return try {
-            value.toInt() in 2020 downTo 2030
+            value.toInt() in 2020..2030 && value.length == 4
         } catch (e: Exception) {
             false
         }
@@ -116,12 +118,20 @@ class HeightCond(private val value: String) : Condition() {
     override fun isComplete(): Boolean {
         return when {
             value.endsWith("cm") -> {
-                val height = value.take(3).toInt()
-                return height in 193 downTo 150
+                try {
+                    val height = value.take(3).toInt()
+                    return height in 150..193
+                } catch (e: Exception) {
+                    false
+                }
             }
             value.endsWith("in") -> {
-                val height = value.take(2).toInt()
-                return height in 76 downTo 59
+                try {
+                    val height = value.take(2).toInt()
+                    return height in 59..79
+                } catch (e: Exception) {
+                    false
+                }
             }
             else -> false
         }
@@ -131,28 +141,26 @@ class HeightCond(private val value: String) : Condition() {
 class HairColorCond(private val value: String) : Condition() {
     override fun isComplete(): Boolean {
         return when {
-            value.startsWith('#') -> {
-                if (value.length == 7) {
-                    val color = value.drop(0)
-                    return containsOnlyDigits(color) || containsOnlyLetters(color)
-                } else {
-                    false
-                }
+            value.startsWith('#') && value.length == 7 -> {
+                val color = value.removePrefix("#")
+                return containsOnlyDigitsOrLettersToF(color.toLowerCase())
             }
             else -> false
         }
     }
 }
 
+
 class EyeColorCond(private val value: String) : Condition() {
     override fun isComplete(): Boolean {
-        return value == "abm" ||
-                value == "blu" ||
-                value == "brn" ||
-                value == "gry" ||
-                value == "grn" ||
-                value == "hzl" ||
-                value == "oth"
+        val value2 = value.toLowerCase()
+        return value2 == "amb" ||
+                value2 == "blu" ||
+                value2 == "brn" ||
+                value2 == "gry" ||
+                value2 == "grn" ||
+                value2 == "hzl" ||
+                value2 == "oth"
     }
 }
 
