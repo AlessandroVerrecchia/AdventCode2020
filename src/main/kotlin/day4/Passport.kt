@@ -28,7 +28,7 @@ class Passport(private val content: String) {
     private val conditions: MutableList<Condition> = mutableListOf()
 
     fun assignConditions() {
-        val rawConditions = content.split(" ", "\n")
+        val rawConditions = content.split(" ", "\r\n")
         rawConditions.forEach {
             when {
                 it.startsWith(BIRTH_YEAR) -> {
@@ -149,7 +149,6 @@ class HairColorCond(private val value: String) : Condition() {
         }
     }
 }
-
 
 class EyeColorCond(private val value: String) : Condition() {
     override fun isComplete(): Boolean {
